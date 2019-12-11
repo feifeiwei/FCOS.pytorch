@@ -46,7 +46,7 @@ class Dataset(Dataset):
     '''
         args: 
 	    root: image path
-            list_path: im_path x y x_max y_max pieces ......
+            list_path: img_name x y x_max y_max pieces ......
         return:
             img_path, input_img, labels[xmin,ymin,xmax,ymax,piece,box_area..]
     '''

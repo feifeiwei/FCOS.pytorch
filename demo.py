@@ -110,6 +110,8 @@ for img_i, (path, boxList) in enumerate(zip(imgs_path, imgs_detection)):
             box_w = int((((x2 - x1) / unpad_w) * img.shape[1]).item())
             y1 = int((((y1 - pad_y // 2) / unpad_h) * img.shape[0]).item())
             x1 = int((((x1 - pad_x // 2) / unpad_w) * img.shape[1]).item())
+            x2 = x1 + box_w
+            y2 = y1 + box_h
             color = bbox_colors[int(np.where(unique_labels == int(label))[0])]
             color = list(map(lambda a: a*255, color))
             font = cv2.FONT_HERSHEY_SIMPLEX

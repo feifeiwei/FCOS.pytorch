@@ -73,12 +73,14 @@ class get_detector(nn.Module):
         pred_cls = pred_cls.view(B, -1, C).sigmoid()  
         pred_box = pred_box.view(B, -1, 4)            
         pred_centerness = pred_centerness.view(B, -1).sigmoid() 
+
+        # multiply the classification scores with centerness scores
+        pred_cls =  pred_cls * pred_centerness[:, :, None]     
         
         cls_mask = pred_cls > self.conf_thresh           
         cls_mask_top_n = cls_mask.view(B, -1).sum(1)           
         cls_mask_top_n = cls_mask_top_n.clamp(max=self.nms_thresh_topN)
-        # multiply the classification scores with centerness scores
-        pred_cls =  pred_cls * pred_centerness[:, :, None]         
+            
         
         res = []
         for b in range(B):

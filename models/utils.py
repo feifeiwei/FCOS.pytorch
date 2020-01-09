@@ -46,8 +46,8 @@ class get_detector(nn.Module):
                 boxlist_for_class.add_field("scores", scores_j)
                 boxlist_for_class = boxlist_nms(boxlist_for_class, self.nms_thresh, score_field='scores')
                 num_labels = len(boxlist_for_class)
-                labels = torch.full((num_labels,), j, dtype=torch.int64, device=scores.device)
-                boxlist_for_class.add_field('labels', labels)
+                labels_cur = torch.full((num_labels,), j, dtype=torch.int64, device=scores.device)
+                boxlist_for_class.add_field('labels', labels_cur)
                 result.append(boxlist_for_class)
 
             #
@@ -115,7 +115,7 @@ class get_detector(nn.Module):
             h,w  = image_sizes[0]
             box_list = BoxList(detections, (w,h), mode='xyxy')
             box_list.add_field('labels', per_box_cls)
-            box_list.add_field('scores', per_cls)  #  * centerness < 0.5
+            box_list.add_field('scores', per_cls)  
             box_list = box_list.clip_to_image(remove_empty=False)      
             res.append(box_list)
             

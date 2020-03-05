@@ -198,8 +198,8 @@ class mul_task_loss(object):
             labels_per_img = target[:,4]
             areas = target[:,-1]
             
-            for idx, area in enumerate(areas):
-                if area == 0.:
+            for idx, area in enumerate(bboxes):
+                if not boxes.bool().any():
                     break
            
             bboxes = bboxes[:idx, :] 
@@ -212,7 +212,17 @@ class mul_task_loss(object):
             b = bboxes[:, 3][None] - ys[:, None] 
             
             reg_targets_per_img = torch.stack([l, t, r, b], dim=2)
-            is_in_boxes = reg_targets_per_img.min(dim=2)[0] > 0   
+            is_in_boxes = reg_targets_per_img.min(dim=2)[0] > 0
+            
+            if (is_in_boxes==True).sum().item() <=0:
+                labels_per_img = torch.zeros(is_in_boxes.size(0)).to(is_in_boxes.device)
+                reg_targets_per_img = torch.zeros(is_in_boxes.size(0),4).to(is_in_boxes.device)
+
+                labels.append(labels_per_img)
+                reg_targets.append(reg_targets_per_img)
+                continue
+                
+            
             max_reg_targets_per_img = reg_targets_per_img.max(dim=2)[0] 
 
             # restrict the regression range for each location 

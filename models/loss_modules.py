@@ -11,7 +11,7 @@ INF = 999999
 
 
 class IOU_loss(nn.Module): 
-    def forward(self, pred, target,weight=None):
+    def forward(self, pred, target,weight=None, eps=1e-6):
         
         #pred
         left = pred[:,0]
@@ -26,14 +26,18 @@ class IOU_loss(nn.Module):
         #compute iou area
         pred_area = (left+right) * (top+bottom)
         target_area = (left_hat+right_hat)*(top_hat+bottom_hat)
+        #pdb.set_trace()
         #compute box iou
         inter_h = torch.min(bottom, bottom_hat) + torch.min(top,top_hat)
         inter_w = torch.min(left, left_hat) + torch.min(right,right_hat)
         
         intersection = inter_h * inter_w
         union = pred_area + target_area - intersection
-        loss = -torch.log((intersection+1.) / (union+1))
+        ious = intersection /union
+
+        loss = -torch.log(ious.clamp(min=eps))
         
+
         if weight is not None:
             return (loss*weight).sum() / weight.sum()
         else:
